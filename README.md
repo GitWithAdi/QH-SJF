@@ -40,32 +40,46 @@ Standard **Shortest Job First (SJF)** minimizes average waiting time but suffers
 Given a ready queue with $n_r$ arrived processes and predicted bursts $\hat{B}_j$:
 
 1. **Total Queued Work ($Q$) & Mean ($\mu$)**:
-   $$Q = \sum_{j \in Ready} \hat{B}_j, \quad \mu = \frac{Q}{n_r}$$
+
+   $$Q = \sum_{j \in \text{Ready}} \hat{B}_j, \quad \mu = \frac{Q}{n_r}$$
 
 2. **Burst Standard Deviation ($\sigma$)**:
-   $$\sigma = \sqrt{\frac{1}{n_r} \sum_{j \in Ready} (\hat{B}_j - \mu)^2}$$
+
+   $$\sigma = \sqrt{\frac{1}{n_r} \sum_{j \in \text{Ready}} (\hat{B}_j - \mu)^2}$$
 
 3. **Workload Pressure ($L \in [0, 1)$)**:
+
    $$L = \frac{Q}{Q + K \cdot B_0}$$
+
    where $K = 5.0$ and $B_0$ is the baseline reference burst (median predicted burst $\times$ multiplier $M_{B_0}$, default $M_{B_0} = 4$).
 
 4. **Heterogeneity Factor ($H \in [0, 1)$)**:
+
    $$H = \begin{cases} \frac{\sigma}{\mu + \sigma} & \text{if } \mu + \sigma > 0 \\ 0 & \text{otherwise} \end{cases}$$
 
 5. **Dynamic Aging Strength ($\alpha \in [\alpha_{\min}, \alpha_{\max}]$)**:
+
    $$\alpha = \alpha_{\min} + (\alpha_{\max} - \alpha_{\min}) \cdot L \cdot H$$
+
    where $\alpha_{\min} = 0.10$ and $\alpha_{\max} = 1.00$.
 
 6. **Priority Score ($S_j$)**:
+
    $$S_j = \frac{\hat{B}_j}{1 + \alpha \left(\frac{W_j}{B_0}\right)^2}$$
+
    where $W_j = t - A_j$ is the waiting time. The ready process with the **lowest score $S_j$** is dispatched next.
 
 7. **Burst Prediction Noise Model**:
+
    In practical operating systems, CPU burst durations are predicted from past execution history rather than known in advance. To evaluate robustness against estimation uncertainty, the benchmark applies a multiplicative log-normal error model:
+
    $$b_i = B_i \exp(s \cdot z_i), \quad z_i \sim \mathcal{N}(0, 1)$$
+
    where $B_i$ is the actual ground-truth CPU burst, $b_i$ (or $\hat{B}_i$) is the predicted burst passed to the scheduler, $s$ is the error intensity parameter (default $s = 0.5$), and $z_i$ is a standard normal variate generated via the Box-Muller transform:
+
    $$z_i = \sqrt{-2\ln(u_1)}\cos(2\pi u_2), \quad u_1, u_2 \sim \mathcal{U}(0, 1)$$
-   Because $\mathbb{E}[\ln(b_i)] = \ln(B_i)$, the median predicted burst equals the true burst ($\operatorname{median}(b_i) = B_i$), ensuring unbiased central tendency while faithfully replicating real-world estimation variance.
+
+   Because $\mathbb{E}[\ln(b_i)] = \ln(B_i)$, the median predicted burst equals the true burst ($\text{median}(b_i) = B_i$), ensuring unbiased central tendency while faithfully replicating real-world estimation variance.
 
 ---
 
