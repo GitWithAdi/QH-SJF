@@ -1,0 +1,29 @@
+# Build artifacts and binaries
+bin/
+build/
+*.o
+*.obj
+*.exe
+*.dll
+*.dylib
+*.so
+*.a
+*.lib
+*.log
+
+# CMake artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile.cmake
+CTestTestfile.cmake
+
+# Original reference folders (kept on disk, untracked for clean git repo)
+qh-sjf-c-app/
+qh-sjf-project/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
